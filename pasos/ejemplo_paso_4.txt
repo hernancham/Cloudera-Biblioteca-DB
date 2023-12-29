@@ -1,0 +1,109 @@
+hdfs dfs -chmod -R 777 /user/cloudera/ejercicio2
+
+#En tu laptop, crear un archivo llamado "persona.txt"
+
+#Al archivo "persona.txt" colocarle el siguiente contenido:
+{
+  "name": "PERSONA",
+  "type": "record",
+  "fields": [
+    {"name": "ID", "type": ["string", "null"]},
+    {"name": "NOMBRE", "type": ["string", "null"]},
+    {"name": "TELEFONO", "type": ["string", "null"]},
+    {"name": "CORREO", "type": ["string", "null"]},
+    {"name": "FECHA_INGRESO", "type": ["string", "null"]},
+    {"name": "EDAD", "type": ["string", "null"]},
+    {"name": "SALARIO", "type": ["string", "null"]},
+    {"name": "ID_EMPRESA", "type": ["string", "null"]}
+  ]
+}
+
+#Desde MobaXterm, subir el archivo "persona.txt" a tu ruta home de LINUX (/home/cloudera)
+
+#Desde la consola HDFS, subir el archivo "persona.txt"
+hdfs dfs -put /home/cloudera/practica2/persona.txt /user/cloudera/ejercicio2/schema/database/cloudera_landing
+
+-- Desde HIVE, creamos la tabla PERSONA 
+CREATE TABLE cloudera_LANDING.PERSONA
+STORED AS AVRO
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing/persona'
+TBLPROPERTIES (
+'avro.schema.url'='hdfs:///user/cloudera/ejercicio2/schema/database/cloudera_landing/persona.txt',
+'avro.output.codec'='snappy'
+);
+
+-- Desde HIVE, activamos la compresión y el formato SNAPPY
+SET hive.exec.compress.output=true;
+SET avro.output.codec=snappy;
+
+-- Desde HIVE, ejecutamos la inserción de datos desde la tabla "LANDING_TMP" a la tabla "LANDING"
+INSERT OVERWRITE TABLE cloudera_LANDING.PERSONA
+SELECT * FROM  cloudera_LANDING_TMP.PERSONA;
+
+-- Desde HIVE, verificamos que se hayan insertado los datos en la tabla "LANDING"
+SELECT * FROM cloudera_LANDING.PERSONA LIMIT 10;
+
+-- Repetir los pasos anteriores para las tablas "EMPRESA" y "TRANSACCION"
+
+{
+  "name": "EMPRESA",
+  "type": "record",
+  "fields": [
+    {"name": "ID", "type": ["string", "null"]},
+    {"name": "NOMBRE", "type": ["string", "null"]}
+  ]
+}
+
+hdfs dfs -put /home/cloudera/practica2/empresa.txt /user/cloudera/ejercicio2/schema/database/cloudera_landing
+
+CREATE TABLE cloudera_LANDING.EMPRESA
+STORED AS AVRO
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing/empresa'
+TBLPROPERTIES (
+'avro.schema.url'='hdfs:///user/cloudera/ejercicio2/schema/database/cloudera_landing/empresa.txt',
+'avro.output.codec'='snappy'
+);
+
+SET hive.exec.compress.output=true;
+SET avro.output.codec=snappy;
+
+INSERT OVERWRITE TABLE cloudera_LANDING.EMPRESA
+SELECT * FROM  cloudera_LANDING_TMP.EMPRESA;
+
+SELECT * FROM cloudera_LANDING.EMPRESA LIMIT 10;
+
+-- 
+
+{
+  "name": "TRANSACCION",
+  "type": "record",
+  "fields": [
+    {"name": "ID_PERSONA", "type": ["string", "null"]},
+    {"name": "ID_EMPRESA", "type": ["string", "null"]},
+    {"name": "MONTO", "type": ["string", "null"]}
+  ]
+}
+
+hdfs dfs -put /home/cloudera/practica2/transaccion.txt /user/cloudera/ejercicio2/schema/database/cloudera_landing
+
+CREATE TABLE cloudera_LANDING.TRANSACCION
+PARTITIONED BY (FECHA STRING)
+STORED AS AVRO
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing/transaccion'
+TBLPROPERTIES (
+'avro.schema.url'='hdfs:///user/cloudera/ejercicio2/schema/database/cloudera_landing/transaccion.txt',
+'avro.output.codec'='snappy'
+);
+
+SET hive.exec.compress.output=true;
+SET avro.output.codec=snappy;
+
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+
+INSERT OVERWRITE TABLE cloudera_LANDING.TRANSACCION
+PARTITION(FECHA) 
+SELECT * FROM  cloudera_LANDING_TMP.TRANSACCION;
+
+
+SELECT * FROM cloudera_LANDING.TRANSACCION LIMIT 10;

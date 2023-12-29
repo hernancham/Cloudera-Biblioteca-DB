@@ -1,0 +1,27 @@
+beeline -u jdbc:hive2://
+
+hdfs dfs -mkdir -p /user/cloudera/HernanCham/bd2/empresa/empleado
+
+CREATE DATABASE EMPRESA LOCATION "/user/cloudera/HernanCham/bd2/empresa";
+
+CREATE TABLE EMPRESA.EMPLEADO(
+employee_id INT,
+first_name STRING,
+last_name STRING,
+email STRING,
+phone_number STRING,
+hire_date DATE,
+job_id INT,
+salary DOUBLE,
+manager_id INT,
+department_id INT
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/user/cloudera/HernanCham/bd2/empresa/empleado';
+
+LOAD DATA LOCAL INPATH '/home/cloudera/employees.csv' INTO TABLE EMPRESA.EMPLEADO;
+
+hdfs dfs -ls /user/cloudera/HernanCham/bd2/empresa/empleado

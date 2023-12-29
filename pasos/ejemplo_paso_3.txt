@@ -1,0 +1,66 @@
+-- En la consola de HIVE, adaptar y ejecutar
+CREATE TABLE cloudera_LANDING_TMP.PERSONA(
+ID STRING,
+NOMBRE STRING,
+TELEFONO STRING,
+CORREO STRING,
+FECHA_INGRESO STRING,
+EDAD STRING,
+SALARIO STRING,
+ID_EMPRESA STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing_tmp/persona';
+
+#En la consola HADOOP, primera forma usando put
+#hdfs dfs -put ~/dataset/persona.data /user/cloudera/ejercicio2/database/cloudera_landing_tmp/persona
+#la otra forma es usando HIVE
+LOAD DATA LOCAL INPATH '/dataset/persona.data'
+INTO TABLE cloudera_LANDING_TMP.PERSONA;
+
+-- En la consola HIVE, verificar que existan los datos en la tabla
+SELECT * FROM cloudera_LANDING_TMP.PERSONA LIMIT 10;
+
+-- Repetir los pasos anteriores para las tablas "EMPRESA" y "TRANSACCION"
+
+CREATE TABLE cloudera_LANDING_TMP.EMPRESA(
+ID STRING,
+NOMBRE STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing_tmp/empresa';
+
+#hdfs dfs -put ~/dataset/empresa.data /user/cloudera/ejercicio2/database/cloudera_landing_tmp/empresa
+LOAD DATA LOCAL INPATH '/dataset/empresa.data'
+INTO TABLE cloudera_LANDING_TMP.EMPRESA;
+
+SELECT * FROM cloudera_LANDING_TMP.EMPRESA LIMIT 10;
+
+-- 
+
+CREATE TABLE cloudera_LANDING_TMP.TRANSACCION(
+ID_PERSONA STRING,
+ID_EMPRESA STRING,
+MONTO STRING,
+FECHA STRING
+)
+ROW FORMAT DELIMITED
+FIELDS TERMINATED BY '|'
+LINES TERMINATED BY '\n'
+STORED AS TEXTFILE
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing_tmp/transaccion';
+
+#hdfs dfs -put ~/dataset/transacciones-2018-01-21.data /user/cloudera/ejercicio2/database/cloudera_landing_tmp/transaccion
+#hdfs dfs -put ~/dataset/transacciones-2018-01-22.data /user/cloudera/ejercicio2/database/cloudera_landing_tmp/transaccion
+#hdfs dfs -put ~/dataset/transacciones-2018-01-23.data /user/cloudera/ejercicio2/database/cloudera_landing_tmp/transaccion
+
+LOAD DATA LOCAL INPATH '/dataset/transacciones.data'
+INTO TABLE cloudera_LANDING_TMP.TRANSACCION;
+
+SELECT * FROM cloudera_LANDING_TMP.TRANSACCION LIMIT 10;

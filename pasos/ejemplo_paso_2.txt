@@ -1,0 +1,11 @@
+-- En la consola de HIVE, adaptar y ejecutar:
+DROP DATABASE IF EXISTS cloudera_LANDING_TMP CASCADE;
+DROP DATABASE IF EXISTS cloudera_LANDING CASCADE;
+DROP DATABASE IF EXISTS cloudera_UNIVERSAL CASCADE;
+DROP DATABASE IF EXISTS cloudera_SMART CASCADE;
+
+
+CREATE DATABASE IF NOT EXISTS cloudera_LANDING_TMP LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing_tmp';
+CREATE DATABASE IF NOT EXISTS cloudera_LANDING LOCATION '/user/cloudera/ejercicio2/database/cloudera_landing';
+CREATE DATABASE IF NOT EXISTS cloudera_UNIVERSAL LOCATION '/user/cloudera/ejercicio2/database/cloudera_universal';
+CREATE DATABASE IF NOT EXISTS cloudera_SMART LOCATION '/user/cloudera/ejercicio2/database/cloudera_smart';

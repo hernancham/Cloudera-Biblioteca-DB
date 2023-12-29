@@ -1,0 +1,31 @@
+#Crear la estructura de carpetas
+hdfs dfs -mkdir /user/cloudera/ejercicio2
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing_tmp
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing_tmp/persona
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing_tmp/empresa
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing_tmp/transaccion
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing/persona
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing/empresa
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_landing/transaccion
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_universal
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_universal/persona
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_universal/empresa
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_universal/transaccion
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_universal/transaccion_enriquecida
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/database/cloudera_smart
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/schema
+hdfs dfs -mkdir /user/cloudera/ejercicio2/schema/database
+
+hdfs dfs -mkdir /user/cloudera/ejercicio2/schema/database/cloudera_landing
+
+
+
+
+

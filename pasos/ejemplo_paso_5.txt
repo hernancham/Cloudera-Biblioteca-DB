@@ -1,0 +1,129 @@
+-- Desde HIVE, creamos la tabla PERSONA 
+CREATE TABLE cloudera_UNIVERSAL.PERSONA(
+ID STRING,
+NOMBRE STRING,
+TELEFONO STRING,
+CORREO STRING,
+FECHA_INGRESO STRING,
+EDAD INT,
+SALARIO DOUBLE,
+ID_EMPRESA STRING
+)
+STORED AS PARQUET
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_universal/persona'
+TBLPROPERTIES ("parquet.compression"="SNAPPY");
+
+-- Desde HIVE, activamos la compresión y el formato SNAPPY
+SET hive.exec.compress.output=true;
+SET parquet.compression=SNAPPY;
+
+-- Desde HIVE, ejecutamos la inserción de datos desde la tabla "LANDING" a la tabla "UNIVERSAL"
+INSERT OVERWRITE TABLE cloudera_UNIVERSAL.PERSONA
+SELECT
+cast(ID AS STRING),
+cast(NOMBRE AS STRING),
+cast(TELEFONO AS STRING),
+cast(CORREO AS STRING),
+cast(FECHA_INGRESO AS STRING),
+cast(EDAD AS INT),
+cast(SALARIO AS DOUBLE),
+cast(ID_EMPRESA AS STRING)
+FROM cloudera_LANDING.PERSONA
+WHERE ID != 'ID';
+
+-- Desde HIVE, verificamos que se hayan insertado los datos en la tabla "LANDING"
+SELECT * FROM cloudera_UNIVERSAL.PERSONA LIMIT 10;
+
+-- Repetir los pasos anteriores para las tablas "EMPRESA" 
+
+CREATE TABLE cloudera_UNIVERSAL.EMPRESA(
+ID STRING,
+NOMBRE STRING
+)
+STORED AS PARQUET
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_universal/empresa'
+TBLPROPERTIES ("parquet.compression"="SNAPPY");
+
+SET hive.exec.compress.output=true;
+SET parquet.compression=SNAPPY;
+
+INSERT OVERWRITE TABLE cloudera_UNIVERSAL.EMPRESA
+SELECT
+cast(ID AS STRING),
+cast(NOMBRE AS STRING)
+FROM cloudera_LANDING.EMPRESA
+WHERE ID != 'ID';
+
+SELECT * FROM cloudera_UNIVERSAL.EMPRESA LIMIT 10;
+
+-- "TRANSACCION"
+
+CREATE TABLE cloudera_UNIVERSAL.TRANSACCION(
+ID_PERSONA STRING,
+ID_EMPRESA STRING,
+MONTO DOUBLE
+)
+PARTITIONED BY (FECHA STRING)
+STORED AS PARQUET
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_universal/transaccion'
+TBLPROPERTIES ("parquet.compression"="SNAPPY");
+
+SET hive.exec.compress.output=true;
+SET parquet.compression=SNAPPY;
+
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+
+INSERT OVERWRITE TABLE cloudera_UNIVERSAL.TRANSACCION
+PARTITION (FECHA)
+SELECT
+cast(ID_PERSONA AS STRING),
+cast(ID_EMPRESA AS STRING),
+cast(MONTO AS DOUBLE),
+cast(FECHA AS STRING)
+FROM cloudera_LANDING.TRANSACCION
+WHERE ID_PERSONA != 'ID_PERSONA';
+
+SELECT * FROM cloudera_UNIVERSAL.TRANSACCION LIMIT 10;
+
+-- TRANSACCION ENRIQUECIDA
+
+CREATE TABLE cloudera_UNIVERSAL.TRANSACCION_ENRIQUECIDA(
+ID_PERSONA INT,
+NOMBRE_PERSONA STRING,
+EDAD_PERSONA INT,
+SALARIO_PERSONA DOUBLE,
+TRABAJO_PERSONA STRING,
+MONTO_TRANSACCION DOUBLE,
+EMPRESA_TRANSACCION STRING
+)
+PARTITIONED BY (FECHA_TRANSACCION STRING)
+STORED AS PARQUET
+LOCATION '/user/cloudera/ejercicio2/database/cloudera_universal/transaccion_enriquecida'
+TBLPROPERTIES ("parquet.compression"="SNAPPY");
+
+SET hive.exec.compress.output=true;
+SET parquet.compression=SNAPPY;
+
+SET hive.exec.dynamic.partition=true;
+SET hive.exec.dynamic.partition.mode=nonstrict;
+
+INSERT OVERWRITE TABLE cloudera_UNIVERSAL.TRANSACCION_ENRIQUECIDA
+PARTITION (FECHA_TRANSACCION)
+SELECT
+T.ID_PERSONA,
+P.NOMBRE,
+P.EDAD,
+P.SALARIO,
+E2.NOMBRE,
+T.MONTO,
+E1.NOMBRE,
+T.FECHA FECHA_TRANSACCION
+FROM cloudera_UNIVERSAL.TRANSACCION T
+JOIN cloudera_UNIVERSAL.PERSONA P ON T.ID_PERSONA = P.ID
+JOIN cloudera_UNIVERSAL.EMPRESA E1 ON T.ID_EMPRESA = E1.ID
+JOIN cloudera_UNIVERSAL.EMPRESA E2 ON P.ID_EMPRESA = E2.ID;
+
+SELECT * FROM cloudera_UNIVERSAL.TRANSACCION_ENRIQUECIDA LIMIT 10;
+
+-- FALTA TUNING
